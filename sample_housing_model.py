@@ -4,9 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score
 
-# ==========================================
 # STEP 1: CREATE THE DATASET (Pandas)
-# ==========================================
 print("--- Step 1: Preparing Data ---")
 np.random.seed(42)
 n_samples = 1000
@@ -28,16 +26,15 @@ for i in range(n_samples):
 df = pd.DataFrame({'SquareFeet': sqft, 'Age': age, 'City': city, 'Price': price})
 print(df.head()) # Shows the first 5 rows
 
-# ==========================================
+
 # STEP 2: CONVERT TEXT TO NUMBERS (One-Hot Encoding)
-# ==========================================
+
 print("\n--- Step 2: Converting City text to numerical flags ---")
 # Machine learning models only understand numbers. This creates binary columns for cities.
-df_encoded = pd.get_dummies(df, columns=['City'], drop_first=True)
+df_encoded = pd.get_dummies(df, columns=['City'], )
 
-# ==========================================
+
 # STEP 3: SPLIT DATA INTO TRAIN & TEST SETS
-# ==========================================
 print("\n--- Step 3: Splitting Dataset ---")
 # X = Input variables (Features), y = Target variable (What we want to predict)
 X = df_encoded.drop('Price', axis=1)
@@ -47,9 +44,9 @@ y = df_encoded['Price']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 print(f"Training samples: {X_train.shape[0]}, Testing samples: {X_test.shape[0]}")
 
-# ==========================================
+
 # STEP 4: TRAIN THE MACHINE LEARNING MODEL
-# ==========================================
+
 print("\n--- Step 4: Training Random Forest Regressor ---")
 # Initializing the model
 model = RandomForestRegressor(n_estimators=100, random_state=42)
@@ -58,9 +55,9 @@ model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 print("Model training completed successfully!")
 
-# ==========================================
+
 # STEP 5: EVALUATE PERFORMANCE
-# ==========================================
+
 print("\n--- Step 5: Calculating Accuracy ---")
 # Predict prices for the unseen test data
 y_pred = model.predict(X_test)
@@ -69,13 +66,31 @@ y_pred = model.predict(X_test)
 accuracy = r2_score(y_test, y_pred)
 print(f"Model R² Score (Accuracy): {accuracy:.2f}")
 
-# ==========================================
+
 # STEP 6: MAKE A LIVE PREDICTION
-# ==========================================
+
 print("\n--- Step 6: Testing with New Live Inputs ---")
 # Example: Predict price for a 2000 SqFt house, 5 years old, located in Gurugram
 # Columns expected by the model: ['SquareFeet', 'Age', 'City_Gurugram', 'City_Noida']
-live_input = pd.DataFrame([[3000, 4, 2, 1]], columns=X.columns)
+square_feet = float(input("Enter house area (SqFt): "))
+age = int(input("Enter house age (years): "))
+while True:
+    city = input("Enter city (Delhi/Noida/Gurugram): ").strip().lower()
+
+    if city in ["delhi", "noida", "gurugram"]:
+        break
+
+    print("Invalid city! Please enter Delhi, Noida, or Gurugram.")
+
+city_gurugram = 1 if city == "gurugram" else 0
+city_noida = 1 if city == "noida" else 0
+city_delhi = 1 if city == "delhi" else 0
+
+live_input = pd.DataFrame(
+    [[square_feet, age, city_delhi, city_gurugram, city_noida]],
+    columns=['SquareFeet', 'Age', 'City_Delhi', 'City_Gurugram', 'City_Noida']
+)
 
 predicted_value = model.predict(live_input)
-print(f"Predicted Price for the house: ₹{predicted_value[0]:,.2f}")
+
+print(f"\nPredicted Price for the house: ₹{predicted_value[0]:,.2f}")
