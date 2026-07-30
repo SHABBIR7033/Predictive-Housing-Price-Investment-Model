@@ -9,6 +9,8 @@ A Machine Learning web application that predicts house prices based on:
 The model is built using **Random Forest Regression** and deployed with **Streamlit**.
 
 ---
+## Live Demo 
+Demo Link: https://predictive-housing-price-investment-model-h6jbujgsp7casjrg9v5s.streamlit.app/
 
 ## 🚀 Features
 
